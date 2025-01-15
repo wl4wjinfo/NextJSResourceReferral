@@ -11,7 +11,7 @@ import {
   Plus,
   Pill,
   TestTube,
-  Ambulance
+  Truck
 } from 'lucide-react'
 
 interface ServiceCardProps {
@@ -82,9 +82,9 @@ export default function Dashboard() {
           bgColor="bg-orange-50"
         />
         <ServiceCard
-          icon={<Ambulance className="text-purple-600" size={24} />}
-          title="Emergency Situation"
-          description="Request an Ambulance"
+          icon={<Truck className="text-purple-600" size={24} />}
+          title="Emergency Transport"
+          description="Request Transportation"
           bgColor="bg-purple-50"
         />
       </div>
