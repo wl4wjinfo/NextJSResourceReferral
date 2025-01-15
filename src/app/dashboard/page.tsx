@@ -1,4 +1,5 @@
-import { Metadata } from 'next'
+'use client';
+
 import Link from 'next/link'
 import { 
   Calendar, 
@@ -12,11 +13,6 @@ import {
   TestTube,
   Ambulance
 } from 'lucide-react'
-
-export const metadata: Metadata = {
-  title: 'Dashboard | Geographical search and refer community resources to community members in need.',
-  description: 'View and manage your resources',
-}
 
 interface ServiceCardProps {
   icon: React.ReactNode
