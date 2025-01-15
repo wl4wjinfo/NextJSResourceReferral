@@ -10,8 +10,9 @@ applications:
           commands:
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
             - npm run build
-            - cp -r public .next/standalone/
             - cp -r .next/static .next/standalone/.next/
+            - cp -r public .next/standalone/
+            - cp server.js .next/standalone/
       artifacts:
         baseDirectory: .next/standalone
         files:
