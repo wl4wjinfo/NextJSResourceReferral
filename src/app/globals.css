@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-rgb: 255, 255, 255;
+  }
+
+  body {
+    @apply text-gray-900 bg-white;
+  }
+}
+
+@layer components {
+  .react-datepicker {
+    @apply font-sans rounded-lg border border-gray-200 shadow-lg;
+  }
+
+  .react-datepicker__header {
+    @apply bg-gray-50 border-b border-gray-200 rounded-t-lg pt-2;
+  }
+
+  .react-datepicker__current-month {
+    @apply font-semibold text-sm text-gray-900;
+  }
+
+  .react-datepicker__day-name {
+    @apply text-gray-500 text-xs;
+  }
+
+  .react-datepicker__day {
+    @apply text-gray-700 rounded-md;
+  }
+
+  .react-datepicker__day:hover {
+    @apply bg-gray-100;
+  }
+
+  .react-datepicker__day--selected {
+    @apply bg-blue-600 !text-white;
+  }
+
+  .react-datepicker__day--keyboard-selected {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .react-datepicker__day--disabled {
+    @apply text-gray-400;
+  }
+
+  .react-datepicker__navigation {
+    @apply top-3;
+  }
+
+  .react-datepicker__navigation-icon::before {
+    @apply border-gray-500;
+  }
+
+  .react-datepicker__input-container input {
+    @apply cursor-pointer;
+  }
+}
+
+@layer utilities {
+  .no-animation {
+    animation: none !important;
+  }
+
+  .logo-glow {
+    animation: glow 4s ease-in-out 4;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes flicker {
+    0% { color: #000000; }
+    50% { color: #008080; }
+    100% { color: #000000; }
+  }
+
+  .torch-flicker {
+    animation: flicker 0.3s infinite;
+  }
+
+  @keyframes gradient-x {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes wave {
+    0%, 100% {
+      transform: translateX(0%) skewX(-15deg);
+    }
+    50% {
+      transform: translateX(-50%) skewX(15deg);
+    }
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 15s ease infinite;
+  }
+
+  /* Gradient Animation for Auth Pages */
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .auth-gradient-bg {
+    background: linear-gradient(
+      -45deg,
+      #134e4a,
+      #042f2e,
+      #000000,
+      #042f2e
+    );
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    position: relative;
+  }
+
+  .auth-gradient-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    pointer-events: none;
+  }
+
+  .auth-container {
+    @apply min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8;
+    backdrop-filter: blur(10px);
+  }
+
+  .auth-card {
+    @apply w-full max-w-md space-y-8 p-8 rounded-xl;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .auth-input {
+    @apply appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .auth-button {
+    @apply relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors duration-200;
+  }
+}
