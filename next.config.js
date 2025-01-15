@@ -2,7 +2,7 @@
 const nextConfig = {
   images: {
     domains: ['images.unsplash.com'],
-    disableStaticImages: false,
+    unoptimized: process.env.NODE_ENV === 'production',
   },
   webpack: (config) => {
     config.resolve.fallback = {
@@ -56,10 +56,9 @@ const nextConfig = {
     ];
   },
   experimental: {
-    serverActions: {
-      allowedOrigins: ['localhost:3000']
-    }
+    serverActions: true
   },
+  output: 'standalone'
 };
 
 module.exports = nextConfig;
