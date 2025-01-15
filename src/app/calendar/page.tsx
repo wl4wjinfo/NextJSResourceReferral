@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Calendar from 'react-calendar';
 import { useRouter } from 'next/navigation';
 import 'react-calendar/dist/Calendar.css';
@@ -32,11 +32,7 @@ export default function CalendarPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  useEffect(() => {
-    fetchEvents()
-  }, [])
-
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -49,24 +45,26 @@ export default function CalendarPage() {
           // Clear any existing error
           setError(null)
           
-          // Redirect to Google auth
-          router.push('/api/auth/google')
+          // Redirect to sign in
+          router.push('/signin')
           return
         }
         
-        throw new Error(data.error || 'Failed to fetch events')
+        throw new Error(data.message || 'Failed to fetch events')
       }
-
+      
       const data = await response.json()
       setEvents(data)
-      setError(null)
     } catch (err) {
-      console.error('Error fetching events:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load events')
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [router])
+
+  useEffect(() => {
+    fetchEvents()
+  }, [fetchEvents])
 
   const getEventsForDate = (selectedDate: Date) => {
     return events.filter(event => {
@@ -182,7 +180,7 @@ export default function CalendarPage() {
             <div className="text-center text-gray-500 py-8 bg-white rounded-lg shadow">
               <p className="mb-2">No upcoming events</p>
               <button
-                onClick={() => router.push('/api/auth/google')}
+                onClick={() => router.push('/signin')}
                 className="text-healthcare-600 hover:text-healthcare-700 underline text-sm"
               >
                 Connect Google Calendar
