@@ -1,0 +1,22 @@
+# Build output
+.next/
+out/
+build/
+
+# Dependencies
+node_modules/
+
+# Test files
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+
+# Generated files
+public/
+coverage/
+
+# Service files with necessary console logs
+src/lib/googleCalendar.ts
+src/middleware.ts
+src/services/DatabaseService.js
+src/utils/geocoding.ts

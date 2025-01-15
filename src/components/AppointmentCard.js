@@ -18,7 +18,8 @@ const AppointmentCard = ({
         <View style={styles.imageContainer}>
           <Image 
             source={imageUrl ? { uri: imageUrl } : require('../assets/default-avatar.png')} 
-            style={styles.doctorImage} 
+            style={styles.doctorImage}
+            alt={`${doctorName}'s profile picture`}
           />
           {isOnline && <View style={styles.onlineIndicator} />}
         </View>
