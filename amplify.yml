@@ -5,23 +5,16 @@ applications:
         preBuild:
           commands:
             # Install dependencies
-            - npm cache clean --force
-            - npm install --legacy-peer-deps
+            - npm ci
             # Set up environment
             - touch .env.production
             # Copy environment variables from Amplify environment
             - |
               echo "NODE_ENV=production" >> .env.production
-              echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.production
-              echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" >> .env.production
-              echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env.production
-              echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env.production
-              echo "JWT_SECRET=$JWT_SECRET" >> .env.production
-              echo "NEO4J_URI=$NEO4J_URI" >> .env.production
-              echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env.production
-              echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env.production
         build:
           commands:
+            # Copy environment variables from Amplify environment
+            - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
             # Build the application
             - npm run build
             # Create required directories
@@ -46,7 +39,7 @@ applications:
             - ls -la .next/standalone/.next/
             - echo "Build completed successfully"
       artifacts:
-        baseDirectory: .next/standalone
+        baseDirectory: .next
         files:
           - '**/*'
       cache:

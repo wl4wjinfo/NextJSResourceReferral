@@ -1,0 +1,9 @@
+{
+  "platform": "nextjs",
+  "framework": "nextjs",
+  "hosting": {
+    "amplifyhosting": {
+      "type": "SSR"
+    }
+  }
+}
