@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
+export const dynamic = 'force-dynamic';
+
 const BASE_URL = process.env.NODE_ENV === 'production' 
   ? process.env.NEXT_PUBLIC_SITE_URL 
   : 'http://localhost:3000';
@@ -47,7 +49,9 @@ export async function middleware(request: NextRequest) {
   const token = request.cookies.get('jwt')?.value
 
   if (!token) {
-    return NextResponse.redirect(`${BASE_URL}/signin`)
+    const url = request.nextUrl.clone()
+    url.pathname = '/signin'
+    return NextResponse.redirect(url)
   }
 
   try {
@@ -57,7 +61,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   } catch (error) {
     // If token is invalid, redirect to signin
-    return NextResponse.redirect(`${BASE_URL}/signin`)
+    const url = request.nextUrl.clone()
+    url.pathname = '/signin'
+    return NextResponse.redirect(url)
   }
 }
 

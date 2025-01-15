@@ -20,7 +20,9 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp']
   },
   poweredByHeader: false,
-  compress: true
+  compress: true,
+  trailingSlash: false,
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx']
 };
 
 export default nextConfig;
