@@ -5,16 +5,19 @@ applications:
         preBuild:
           commands:
             - npm install --legacy-peer-deps
-            - npm install -g env-cmd
             - touch .env.production
+            # Copy environment variables from Amplify environment
             - |
-              if [ "${AWS_BRANCH}" = "main" ]; then
-                echo "Setting production environment variables"
-                aws ssm get-parameters-by-path --path "/amplify/${AWS_APP_ID}/${AWS_BRANCH}/" --with-decryption --recursive | jq -r '.Parameters[] | .Name + "=" + .Value' > .env.production
-              fi
+              echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.production
+              echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" >> .env.production
+              echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env.production
+              echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env.production
+              echo "JWT_SECRET=$JWT_SECRET" >> .env.production
+              echo "NEO4J_URI=$NEO4J_URI" >> .env.production
+              echo "NEO4J_USERNAME=$NEO4J_USERNAME" >> .env.production
+              echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env.production
         build:
           commands:
-            - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
             - npm run build
             - mkdir -p .next/standalone/.next/static
             - cp -r .next/static/* .next/standalone/.next/static/

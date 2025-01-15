@@ -6,15 +6,42 @@ const fs = require('fs')
 
 // Load environment variables from .env.production in production
 if (process.env.NODE_ENV === 'production') {
-  const envPath = path.join(__dirname, '.env.production')
-  if (fs.existsSync(envPath)) {
-    require('dotenv').config({ path: envPath })
+  try {
+    const envPath = path.join(__dirname, '.env.production')
+    if (fs.existsSync(envPath)) {
+      const envConfig = require('dotenv').parse(fs.readFileSync(envPath))
+      for (const k in envConfig) {
+        process.env[k] = envConfig[k]
+      }
+      console.log('Successfully loaded environment variables')
+    } else {
+      console.warn('No .env.production file found')
+    }
+  } catch (err) {
+    console.error('Error loading environment variables:', err)
   }
 }
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost'
 const port = process.env.PORT || 3000
+
+// Verify required environment variables
+const requiredEnvVars = [
+  'NEXT_PUBLIC_SITE_URL',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
+  'JWT_SECRET',
+  'NEO4J_URI',
+  'NEO4J_USERNAME',
+  'NEO4J_PASSWORD'
+]
+
+requiredEnvVars.forEach(envVar => {
+  if (!process.env[envVar]) {
+    console.warn(`Warning: ${envVar} is not set`)
+  }
+})
 
 const app = next({ 
   dev,
