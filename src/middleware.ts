@@ -1,70 +1,75 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import * as jose from 'jose';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { jwtVerify } from 'jose'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const encoder = new TextEncoder();
+const BASE_URL = process.env.NODE_ENV === 'production' 
+  ? process.env.NEXT_PUBLIC_SITE_URL 
+  : 'http://localhost:3000';
 
-// List of public routes that don't require authentication
-const publicRoutes = ['/signin', '/signup', '/forgot-password'];
+// List of paths that require authentication
+const protectedPaths = [
+  '/calendar',
+  '/profile',
+  '/dashboard',
+  '/messages',
+  '/events',
+  '/map',
+  '/book-appointment',
+  '/resource',
+  '/resources'
+]
+
+// List of paths that are public
+const publicPaths = [
+  '/signin',
+  '/signup',
+  '/privacy',
+  '/terms',
+  '/',
+  '/api/auth/google/callback'
+]
 
 export async function middleware(request: NextRequest) {
-  console.log('Middleware processing request:', request.nextUrl.pathname);
-  
-  // Set CSP headers for all responses
-  const response = NextResponse.next();
-  
-  // Add CSP headers to allow Google Maps
-  const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com;
-    style-src 'self' 'unsafe-inline' https://*.googleapis.com;
-    img-src 'self' data: https://*.googleapis.com https://*.gstatic.com;
-    font-src 'self' https://*.gstatic.com;
-    connect-src 'self' https://*.googleapis.com;
-  `.replace(/\s+/g, ' ').trim();
+  const path = request.nextUrl.pathname
 
-  response.headers.set('Content-Security-Policy', cspHeader);
-
-  // Allow root path for splash page
-  if (request.nextUrl.pathname === '/') {
-    console.log('Allowing access to root path');
-    return response;
+  // Allow public paths
+  if (publicPaths.some(p => path.startsWith(p))) {
+    return NextResponse.next()
   }
 
-  // Don't check auth for public routes
-  if (publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {
-    console.log('Public route detected:', request.nextUrl.pathname);
-    return response;
+  // Check if path is protected
+  const isProtectedPath = protectedPaths.some(p => path.startsWith(p))
+  if (!isProtectedPath) {
+    return NextResponse.next()
   }
 
-  // Check for auth token
-  const token = request.cookies.get('auth-token');
-  console.log('Auth token found:', !!token);
+  // Get JWT token from cookie
+  const token = request.cookies.get('jwt')?.value
 
   if (!token) {
-    console.log('No auth token, redirecting to signin');
-    return NextResponse.redirect(new URL('/signin', request.url));
+    return NextResponse.redirect(`${BASE_URL}/signin`)
   }
 
   try {
-    // Create secret key
-    const secretKey = await encoder.encode(JWT_SECRET);
-    
-    // Verify the token
-    await jose.jwtVerify(token.value, secretKey);
-    
-    console.log('Token verified successfully');
-    return response;
+    // Verify JWT token
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    await jwtVerify(token, secret)
+    return NextResponse.next()
   } catch (error) {
     // If token is invalid, redirect to signin
-    console.error('Token verification failed:', error);
-    return NextResponse.redirect(new URL('/signin', request.url));
+    return NextResponse.redirect(`${BASE_URL}/signin`)
   }
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (public files)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
-};
+}

@@ -1,62 +1,63 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
+export const dynamic = 'force-dynamic';
+
+const BASE_URL = process.env.NODE_ENV === 'production' 
+  ? process.env.NEXT_PUBLIC_SITE_URL 
+  : 'http://localhost:3000';
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
-    
-    if (!code) {
-      console.error('No authorization code present');
-      return NextResponse.redirect(new URL('/calendar?error=No_authorization_code', request.url));
-    }
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-    
-    if (!clientId || !clientSecret) {
-      console.error('Missing OAuth credentials');
-      return NextResponse.redirect(new URL('/calendar?error=Configuration_error', request.url));
+    if (!code) {
+      return NextResponse.redirect(`${BASE_URL}/calendar?error=No_authorization_code`);
     }
 
     const oauth2Client = new google.auth.OAuth2(
-      clientId,
-      clientSecret,
-      'http://localhost:3000/api/auth/google/callback'
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${BASE_URL}/api/auth/google/callback`
     );
 
-    const { tokens } = await oauth2Client.getToken(code);
-    
-    if (!tokens) {
-      console.error('Failed to get tokens');
-      return NextResponse.redirect(new URL('/calendar?error=Token_error', request.url));
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return NextResponse.redirect(`${BASE_URL}/calendar?error=Configuration_error`);
     }
 
-    // Store tokens in cookies
-    const response = NextResponse.redirect(new URL('/calendar', request.url));
-    
-    // Set access token cookie (short-lived)
-    response.cookies.set('access_token', tokens.access_token || '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 3600 // 1 hour
-    });
+    try {
+      const { tokens } = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(tokens);
 
-    // Set refresh token cookie (long-lived)
-    if (tokens.refresh_token) {
+      if (!tokens.access_token || !tokens.refresh_token) {
+        return NextResponse.redirect(`${BASE_URL}/calendar?error=Token_error`);
+      }
+
+      const response = NextResponse.redirect(`${BASE_URL}/calendar`);
+
+      // Set cookies
+      response.cookies.set('access_token', tokens.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 3600 // 1 hour
+      });
+
       response.cookies.set('refresh_token', tokens.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        maxAge: 30 * 24 * 60 * 60 // 30 days
+        maxAge: 7 * 24 * 3600 // 7 days
       });
+
+      return response;
+    } catch (error) {
+      console.error('Token error:', error);
+      return NextResponse.redirect(`${BASE_URL}/calendar?error=Token_error`);
     }
-
-    return response;
-
   } catch (error) {
     console.error('Callback error:', error);
-    return NextResponse.redirect(new URL('/calendar?error=Internal_server_error', request.url));
+    return NextResponse.redirect(`${BASE_URL}/calendar?error=Internal_server_error`);
   }
 }
