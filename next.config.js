@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: ['images.unsplash.com'],
     unoptimized: process.env.NODE_ENV === 'production',
@@ -56,9 +57,9 @@ const nextConfig = {
     ];
   },
   experimental: {
-    serverActions: true
+    serverActions: true,
   },
-  output: 'standalone'
+  distDir: '.next'
 };
 
 module.exports = nextConfig;
