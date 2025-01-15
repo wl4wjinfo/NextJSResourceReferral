@@ -24,22 +24,24 @@ applications:
           commands:
             # Build the application
             - npm run build
-            # Set up standalone directory
+            # Create required directories
             - mkdir -p .next/standalone/.next/static
             - mkdir -p .next/standalone/.next/server
             - mkdir -p .next/standalone/.next/cache
-            # Copy static files
+            # Copy build output
             - cp -r .next/static/* .next/standalone/.next/static/
+            - cp -r .next/server .next/standalone/.next/
+            - cp -r .next/cache .next/standalone/.next/
+            - cp -r .next/types .next/standalone/.next/
+            - cp .next/required-server-files.json .next/standalone/.next/
+            # Copy public files
             - cp -r public .next/standalone/
             # Copy server files
             - cp package.json .next/standalone/
             - cp server.js .next/standalone/
             - cp .env.production .next/standalone/
-            # Copy Next.js files
-            - cp -r .next/standalone/* ./
-            - cp -r .next/trace .next/standalone/
-            - cp -r .next/server .next/standalone/.next/
-            - cp .next/required-server-files.json .next/standalone/.next/
+            # Copy node_modules for server
+            - cp -r node_modules .next/standalone/
             # Verify files
             - ls -la .next/standalone/.next/
             - echo "Build completed successfully"
@@ -47,10 +49,6 @@ applications:
         baseDirectory: .next/standalone
         files:
           - '**/*'
-          - .next/**/*
-          - server.js
-          - public/**/*
-          - .env.production
       cache:
         paths:
           - node_modules/**/*

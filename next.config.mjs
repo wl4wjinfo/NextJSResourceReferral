@@ -23,7 +23,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: true,
-    serverComponentsExternalPackages: ['sharp']
+    serverComponentsExternalPackages: ['sharp', 'neo4j-driver']
   },
   poweredByHeader: false,
   compress: true,
@@ -40,6 +40,21 @@ const nextConfig = {
   swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'
+  },
+  // Server configuration
+  serverRuntimeConfig: {
+    PROJECT_ROOT: __dirname
+  },
+  // Build configuration
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Server-specific webpack config
+      config.externals.push({
+        'sharp': 'commonjs sharp',
+        'neo4j-driver': 'commonjs neo4j-driver'
+      })
+    }
+    return config
   }
 };
 
