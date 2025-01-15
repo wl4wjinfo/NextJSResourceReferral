@@ -4,10 +4,14 @@ applications:
       phases:
         preBuild:
           commands:
+            # Install dependencies
+            - npm cache clean --force
             - npm install --legacy-peer-deps
+            # Set up environment
             - touch .env.production
             # Copy environment variables from Amplify environment
             - |
+              echo "NODE_ENV=production" >> .env.production
               echo "NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL" >> .env.production
               echo "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY" >> .env.production
               echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env.production
@@ -18,19 +22,27 @@ applications:
               echo "NEO4J_PASSWORD=$NEO4J_PASSWORD" >> .env.production
         build:
           commands:
+            # Build the application
             - npm run build
+            # Set up standalone directory
             - mkdir -p .next/standalone/.next/static
+            - mkdir -p .next/standalone/.next/server
+            - mkdir -p .next/standalone/.next/cache
+            # Copy static files
             - cp -r .next/static/* .next/standalone/.next/static/
             - cp -r public .next/standalone/
+            # Copy server files
             - cp package.json .next/standalone/
             - cp server.js .next/standalone/
             - cp .env.production .next/standalone/
-            - mkdir -p .next/standalone/.next
+            # Copy Next.js files
             - cp -r .next/standalone/* ./
             - cp -r .next/trace .next/standalone/
             - cp -r .next/server .next/standalone/.next/
             - cp .next/required-server-files.json .next/standalone/.next/
+            # Verify files
             - ls -la .next/standalone/.next/
+            - echo "Build completed successfully"
       artifacts:
         baseDirectory: .next/standalone
         files:

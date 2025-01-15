@@ -8,6 +8,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
     domains: ['images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**'
+      }
+    ]
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -25,7 +31,16 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   // Ensure server files are included in the build
   outputFileTracing: true,
-  outputStandalone: true
+  outputStandalone: true,
+  // AWS specific settings
+  assetPrefix: process.env.NEXT_PUBLIC_SITE_URL,
+  basePath: '',
+  // Improve production performance
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+  }
 };
 
 export default nextConfig;
