@@ -11,9 +11,16 @@
   },
   "overrides": [
     {
-      "files": ["src/app/services/**/*.ts", "src/app/services/**/*.js"],
+      "files": [
+        "src/app/services/**/*",
+        "src/services/**/*",
+        "src/utils/**/*",
+        "src/lib/**/*",
+        "src/app/resources/**/*"
+      ],
       "rules": {
-        "no-console": "off"
+        "no-console": "off",
+        "@typescript-eslint/no-unused-vars": "off"
       }
     }
   ]
