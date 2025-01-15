@@ -16,7 +16,6 @@ public/
 coverage/
 
 # Service files with necessary console logs
-src/lib/googleCalendar.ts
+src/app/services/
+src/app/api/
 src/middleware.ts
-src/services/DatabaseService.js
-src/utils/geocoding.ts
