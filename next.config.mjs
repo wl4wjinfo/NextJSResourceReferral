@@ -16,7 +16,9 @@ const nextConfig = {
   },
   experimental: {
     serverActions: true
-  }
+  },
+  poweredByHeader: false,
+  compress: true
 };
 
 export default nextConfig;

@@ -9,12 +9,11 @@ applications:
           commands:
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
             - npm run build
-            - cp -r .next/static .next/standalone/.next/
+            - mkdir -p .next/standalone/.next/static
+            - cp -r .next/static/* .next/standalone/.next/static/
             - cp -r public .next/standalone/
             - cp package.json .next/standalone/
             - cp server.js .next/standalone/
-            - cp -r .next/standalone/* ./
-            - cp -r .next/static .next/
             - cp -r .next/required-server-files.json .next/standalone/.next/
       artifacts:
         baseDirectory: .next/standalone
