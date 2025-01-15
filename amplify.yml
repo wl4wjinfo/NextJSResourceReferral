@@ -11,16 +11,19 @@ applications:
             - npm run build
             - mkdir -p .next/standalone/.next/static
             - cp -r .next/static/* .next/standalone/.next/static/
+            - cp -r .next/standalone/* ./
+            - cp -r .next/required-server-files.json ./
             - cp -r public .next/standalone/
             - cp package.json .next/standalone/
             - cp server.js .next/standalone/
-            - cp -r .next/required-server-files.json .next/standalone/.next/
       artifacts:
-        baseDirectory: .next/standalone
+        baseDirectory: .
         files:
           - '**/*'
           - .next/required-server-files.json
           - server.js
+          - public/**/*
+          - .next/static/**/*
       cache:
         paths:
           - node_modules/**/*

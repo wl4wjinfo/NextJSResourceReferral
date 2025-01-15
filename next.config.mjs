@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  distDir: '.next',
   generateBuildId: async () => {
     return 'build'
   },
@@ -15,7 +16,8 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
   experimental: {
-    serverActions: true
+    serverActions: true,
+    serverComponentsExternalPackages: ['sharp']
   },
   poweredByHeader: false,
   compress: true
