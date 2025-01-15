@@ -22,7 +22,10 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   trailingSlash: false,
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx']
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  // Ensure server files are included in the build
+  outputFileTracing: true,
+  outputStandalone: true
 };
 
 export default nextConfig;

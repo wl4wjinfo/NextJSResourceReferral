@@ -1,10 +1,21 @@
 const { createServer } = require('http')
 const { parse } = require('url')
 const next = require('next')
+const path = require('path')
+const fs = require('fs')
+
+// Load environment variables from .env.production in production
+if (process.env.NODE_ENV === 'production') {
+  const envPath = path.join(__dirname, '.env.production')
+  if (fs.existsSync(envPath)) {
+    require('dotenv').config({ path: envPath })
+  }
+}
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost'
 const port = process.env.PORT || 3000
+
 const app = next({ 
   dev,
   dir: __dirname,
@@ -16,6 +27,7 @@ const app = next({
     poweredByHeader: false
   }
 })
+
 const handle = app.getRequestHandler()
 
 app.prepare().then(() => {

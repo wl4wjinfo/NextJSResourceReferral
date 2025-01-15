@@ -5,6 +5,13 @@ applications:
         preBuild:
           commands:
             - npm install --legacy-peer-deps
+            - npm install -g env-cmd
+            - touch .env.production
+            - |
+              if [ "${AWS_BRANCH}" = "main" ]; then
+                echo "Setting production environment variables"
+                aws ssm get-parameters-by-path --path "/amplify/${AWS_APP_ID}/${AWS_BRANCH}/" --with-decryption --recursive | jq -r '.Parameters[] | .Name + "=" + .Value' > .env.production
+              fi
         build:
           commands:
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
@@ -14,20 +21,21 @@ applications:
             - cp -r public .next/standalone/
             - cp package.json .next/standalone/
             - cp server.js .next/standalone/
+            - cp .env.production .next/standalone/
+            - mkdir -p .next/standalone/.next
             - cp -r .next/standalone/* ./
             - cp -r .next/trace .next/standalone/
             - cp -r .next/server .next/standalone/.next/
-            - cp -r .next/required-server-files.json .next/standalone/.next/
+            - cp .next/required-server-files.json .next/standalone/.next/
+            - ls -la .next/standalone/.next/
       artifacts:
         baseDirectory: .next/standalone
         files:
           - '**/*'
-          - .next/required-server-files.json
-          - .next/trace/**/*
-          - .next/server/**/*
+          - .next/**/*
           - server.js
           - public/**/*
-          - .next/static/**/*
+          - .env.production
       cache:
         paths:
           - node_modules/**/*
