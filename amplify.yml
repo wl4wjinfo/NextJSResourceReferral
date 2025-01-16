@@ -5,11 +5,12 @@ applications:
         preBuild:
           commands:
             - nvm use 18
-            - yarn install --production
+            - rm -f package-lock.json
+            - yarn install --frozen-lockfile
         build:
           commands:
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
-            - npm run build
+            - yarn build
       artifacts:
         baseDirectory: .next
         files:
