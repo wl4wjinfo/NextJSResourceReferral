@@ -4,40 +4,11 @@ applications:
       phases:
         preBuild:
           commands:
-            # Install dependencies
             - npm ci
-            # Set up environment
-            - touch .env.production
-            # Copy environment variables from Amplify environment
-            - |
-              echo "NODE_ENV=production" >> .env.production
         build:
           commands:
-            # Copy environment variables from Amplify environment
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
-            # Build the application
             - npm run build
-            # Create required directories
-            - mkdir -p .next/standalone/.next/static
-            - mkdir -p .next/standalone/.next/server
-            - mkdir -p .next/standalone/.next/cache
-            # Copy build output
-            - cp -r .next/static/* .next/standalone/.next/static/
-            - cp -r .next/server .next/standalone/.next/
-            - cp -r .next/cache .next/standalone/.next/
-            - cp -r .next/types .next/standalone/.next/
-            - cp .next/required-server-files.json .next/standalone/.next/
-            # Copy public files
-            - cp -r public .next/standalone/
-            # Copy server files
-            - cp package.json .next/standalone/
-            - cp server.js .next/standalone/
-            - cp .env.production .next/standalone/
-            # Copy node_modules for server
-            - cp -r node_modules .next/standalone/
-            # Verify files
-            - ls -la .next/standalone/.next/
-            - echo "Build completed successfully"
       artifacts:
         baseDirectory: .next
         files:
