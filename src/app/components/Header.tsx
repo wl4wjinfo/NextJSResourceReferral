@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Settings, Bell } from 'lucide-react';
-import WomanLeadingImage from '@/assets/WOMAN LEADING.zip - 3.png';
 
 export default function Header() {
   return (
@@ -12,7 +11,7 @@ export default function Header() {
           <Link href="/dashboard" className="flex items-center gap-3">
             <div className="w-10 h-10">
               <Image
-                src={WomanLeadingImage}
+                src="/images/woman-leading.png"
                 alt="Woman Leading"
                 width={40}
                 height={40}
@@ -20,26 +19,17 @@ export default function Header() {
                 priority
               />
             </div>
-            <div>
-              <h1 className="text-lg font-semibold text-healthcare-900">Women Leading</h1>
-              <p className="text-xs text-gray-600">Resource Search</p>
-            </div>
+            <span className="text-xl font-semibold">Women Leading</span>
           </Link>
 
-          {/* Right Actions */}
+          {/* Navigation Icons */}
           <div className="flex items-center gap-4">
-            <button
-              className="p-2 text-gray-600 hover:text-healthcare-600 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="w-6 h-6" />
-            </button>
-            <button
-              className="p-2 text-gray-600 hover:text-healthcare-600 transition-colors"
-              aria-label="Settings"
-            >
-              <Settings className="w-6 h-6" />
-            </button>
+            <Link href="/notifications">
+              <Bell className="w-6 h-6 text-gray-600 hover:text-gray-900" />
+            </Link>
+            <Link href="/settings">
+              <Settings className="w-6 h-6 text-gray-600 hover:text-gray-900" />
+            </Link>
           </div>
         </div>
       </div>

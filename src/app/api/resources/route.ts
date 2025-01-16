@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import resourceData from '@/misc/WL4WJ_ResourceSpreadsheet.json';
-import { geocodeAddress } from '@/utils/geocoding';
+import { geocodeAddress } from '../../../utils/geocoding';
+import fs from 'fs';
+import path from 'path';
 
 const DEFAULT_COORDINATES = {
   lat: 35.2271, // North Carolina center latitude
@@ -9,6 +10,11 @@ const DEFAULT_COORDINATES = {
 
 export async function GET() {
   try {
+    // Read the JSON file
+    const filePath = path.join(process.cwd(), 'public', 'data', 'resources.json');
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const resourceData = JSON.parse(fileContents);
+
     // Add IDs and filter out empty resources
     const validResources = resourceData
       .filter((resource: any) => resource.Organization && resource.Organization.trim())
@@ -19,111 +25,90 @@ export async function GET() {
 
     console.log(`Processing ${validResources.length} valid resources...`);
 
-    // Geocode addresses for resources that don't have coordinates
-    const geocodedResources = await Promise.all(
-      validResources.map(async (resource) => {
-        // If resource already has valid coordinates, use them
-        if (typeof resource.latitude === 'number' && 
-            typeof resource.longitude === 'number' &&
-            !isNaN(resource.latitude) && 
-            !isNaN(resource.longitude)) {
-          return resource;
-        }
+    // Process resources in batches to avoid rate limits
+    const batchSize = 10;
+    const processedResources = [];
 
-        // Construct the most complete address possible
-        const addressParts = [];
-        if (resource.Address) addressParts.push(resource.Address.trim());
-        if (resource.City) addressParts.push(resource.City.trim());
-        if (resource['State ']) addressParts.push(resource['State '].trim());
-        if (resource.Zip) addressParts.push(resource.Zip.toString().trim());
+    for (let i = 0; i < validResources.length; i += batchSize) {
+      const batch = validResources.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (resource: any) => {
+        if (!resource.latitude || !resource.longitude) {
+          const address = [
+            resource.Address,
+            resource.City,
+            'NC',
+            resource.Zip
+          ].filter(Boolean).join(', ');
 
-        // If we have no address information, use default coordinates
-        if (addressParts.length === 0) {
-          console.warn('No address information for resource:', resource.Organization);
-          return {
-            ...resource,
-            latitude: DEFAULT_COORDINATES.lat,
-            longitude: DEFAULT_COORDINATES.lng,
-            geocodedAddress: 'Location not specified'
-          };
-        }
-
-        const address = addressParts.join(', ');
-        
-        try {
-          const geocoded = await geocodeAddress(address);
-          if (geocoded) {
-            return {
-              ...resource,
-              latitude: geocoded.lat,
-              longitude: geocoded.lng,
-              geocodedAddress: geocoded.formattedAddress
-            };
-          } else {
-            console.warn('Failed to geocode address for:', resource.Organization);
-            // If geocoding fails, use default coordinates
-            return {
-              ...resource,
-              latitude: DEFAULT_COORDINATES.lat,
-              longitude: DEFAULT_COORDINATES.lng,
-              geocodedAddress: address
-            };
+          if (address.trim()) {
+            try {
+              const coordinates = await geocodeAddress(address);
+              return {
+                ...resource,
+                latitude: coordinates?.lat || DEFAULT_COORDINATES.lat,
+                longitude: coordinates?.lng || DEFAULT_COORDINATES.lng
+              };
+            } catch (error) {
+              console.error(`Error geocoding address for ${resource.Organization}:`, error);
+              return {
+                ...resource,
+                latitude: DEFAULT_COORDINATES.lat,
+                longitude: DEFAULT_COORDINATES.lng
+              };
+            }
           }
-        } catch (error) {
-          console.error('Error geocoding resource:', resource.Organization, error);
-          // On error, use default coordinates
-          return {
-            ...resource,
-            latitude: DEFAULT_COORDINATES.lat,
-            longitude: DEFAULT_COORDINATES.lng,
-            geocodedAddress: address
-          };
         }
-      })
-    );
+        return resource;
+      });
 
-    console.log(`Successfully processed ${geocodedResources.length} resources`);
-    return NextResponse.json(geocodedResources);
+      const batchResults = await Promise.all(batchPromises);
+      processedResources.push(...batchResults);
+
+      // Add a small delay between batches to respect rate limits
+      if (i + batchSize < validResources.length) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    return NextResponse.json({
+      resources: processedResources,
+      total: processedResources.length
+    });
   } catch (error) {
     console.error('Error processing resources:', error);
-    return NextResponse.json({ error: 'Failed to process resources' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to process resources' },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const resource = await request.json();
+    const data = await request.json();
     
-    // Construct the most complete address possible
-    const addressParts = [];
-    if (resource.Address) addressParts.push(resource.Address.trim());
-    if (resource.City) addressParts.push(resource.City.trim());
-    if (resource['State ']) addressParts.push(resource['State '].trim());
-    if (resource.Zip) addressParts.push(resource.Zip.toString().trim());
-
-    const address = addressParts.join(', ');
+    // Read existing resources
+    const filePath = path.join(process.cwd(), 'public', 'data', 'resources.json');
+    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const resources = JSON.parse(fileContents);
     
-    // Geocode the address
-    const geocoded = await geocodeAddress(address);
-    
-    // Use geocoded coordinates or default coordinates
-    const coordinates = geocoded || DEFAULT_COORDINATES;
-
-    // Add metadata to the resource
+    // Add new resource
     const newResource = {
-      ...resource,
-      IsRecordComplete_: 'Yes',
-      LastDateUpdated: new Date().toISOString(),
-      latitude: coordinates.lat,
-      longitude: coordinates.lng,
-      geocodedAddress: geocoded ? geocoded.formattedAddress : address
+      ...data,
+      id: `resource-${resources.length + 1}`,
+      createdAt: new Date().toISOString()
     };
-
+    
+    resources.push(newResource);
+    
+    // Write back to file
+    fs.writeFileSync(filePath, JSON.stringify(resources, null, 2));
+    
     return NextResponse.json(newResource);
   } catch (error) {
-    console.error('Error creating resource:', error);
+    console.error('Error adding resource:', error);
     return NextResponse.json(
-      { error: 'Failed to create resource' },
+      { error: 'Failed to add resource' },
       { status: 500 }
     );
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getLocations } from '@/app/services/neo4j';
+import { getLocations } from '../../../services/neo4j';
 
 export async function GET() {
   try {

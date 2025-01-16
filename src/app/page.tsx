@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import womanLeadingLogo from '../assets/WOMAN LEADING.zip - 3.png';
 import { FaFire } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -25,59 +24,44 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-black animate-gradient-x">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(0,0,0,0.8),transparent_60%)] animate-pulse"></div>
-        <div className="absolute inset-0">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-black/20"
-              style={{
-                transform: `translateX(${i * 100}%)`,
-                animation: `wave ${6 + i * 2}s infinite ease-in-out ${i * 2}s`,
-              }}
-            ></div>
-          ))}
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-white px-4">
-        <div className="w-full max-w-[90vw] md:max-w-md flex flex-col items-center">
-          <h1 className="text-2xl md:text-4xl font-bold text-healthcare-800 text-center mb-6 md:mb-8">
-            Women Leading for Wellness and Justice
-          </h1>
-          
-          <div className="relative w-48 h-48 md:w-64 md:h-64 mb-6 md:mb-8">
+    <div className="min-h-screen bg-white">
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center justify-center space-y-8 text-center">
+          <div className="w-32 h-32 relative">
             <Image
-              src={womanLeadingLogo}
+              src="/images/woman-leading.png"
               alt="Women Leading Logo"
-              fill
+              width={128}
+              height={128}
               className="object-contain"
               priority
             />
           </div>
-
-          <h2 className="text-lg md:text-2xl text-healthcare-600 text-center max-w-[90vw] md:max-w-2xl mb-8">
-            North Carolina Sandhills Resource Referral Application
-          </h2>
-
-          {/* Loading Animation Container */}
-          <div className="relative mt-8 flex flex-col items-center">
-            {/* Glowing Torch */}
-            <div className="mb-4">
-              <FaFire size={48} className="torch-flicker" />
-            </div>
-
-            {/* Loading Text */}
-            <p className="text-healthcare-600 text-sm animate-pulse">
-              Loading resources...
-            </p>
+          
+          <h1 className="text-4xl font-bold text-gray-900">
+            Women Leading Resources
+          </h1>
+          
+          <p className="text-xl text-gray-600 max-w-2xl">
+            Connecting women with the resources they need to succeed
+          </p>
+          
+          <div className="flex gap-4">
+            <Link
+              href="/signin"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/signup"
+              className="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+            >
+              Sign Up
+            </Link>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
