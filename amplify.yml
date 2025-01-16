@@ -4,7 +4,7 @@ applications:
       phases:
         preBuild:
           commands:
-            - npm ci --production=false
+            - npm ci --omit=dev
             - npm install -g npm@latest
         build:
           commands:
