@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { FaFire } from 'react-icons/fa';
 import Link from 'next/link';
 
 export default function Home() {
@@ -24,9 +23,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-col items-center justify-center space-y-8 text-center">
+    <div className="min-h-screen animated-bg">
+      <main className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-8 text-center bg-white/90 p-8 rounded-2xl backdrop-blur-sm shadow-xl">
           <div className="w-32 h-32 relative">
             <Image
               src="/images/woman-leading.png"
