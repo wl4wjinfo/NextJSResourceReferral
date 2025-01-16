@@ -5,7 +5,7 @@ applications:
         preBuild:
           commands:
             - nvm use 18
-            - yarn install
+            - yarn install --production
         build:
           commands:
             - env | grep -e NEXT_PUBLIC_ -e JWT_ -e NEO4J_ -e GOOGLE_ >> .env.production
@@ -14,11 +14,11 @@ applications:
         baseDirectory: .next
         files:
           - '**/*'
-      secondaryArtifacts:
-        public:
-          baseDirectory: public
-          files:
-            - '**/*'
+        secondaryArtifacts:
+          public:
+            baseDirectory: public
+            files:
+              - '**/*'
       cache:
         paths:
           - node_modules/**/*
