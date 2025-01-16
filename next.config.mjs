@@ -3,8 +3,13 @@ const nextConfig = {
   output: 'standalone',
   distDir: '.next',
   images: {
-    unoptimized: true,
-    domains: ['lh3.googleusercontent.com'],
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      }
+    ]
   },
   eslint: {
     ignoreDuringBuilds: true,
