@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Send, Phone, MessageCircle } from 'lucide-react'
-import BottomNav from '@/components/BottomNav'
+import BottomNav from '../components/BottomNav'
 
 interface Message {
   id: string

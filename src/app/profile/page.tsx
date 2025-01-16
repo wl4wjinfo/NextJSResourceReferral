@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Camera, Edit2, Save, X, Plus, Trash2 } from 'lucide-react'
-import BottomNav from '@/components/BottomNav'
+import BottomNav from '../components/BottomNav'
 
 interface Profile {
   name: string

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Calendar, Plus, Trash2 } from 'lucide-react';
-import BottomNav from '@/components/BottomNav';
+import BottomNav from '../components/BottomNav';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
